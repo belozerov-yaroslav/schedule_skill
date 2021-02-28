@@ -58,7 +58,7 @@ def handle_dialog(req, res):
             ]
         }
 
-        res['response']['text'] = 'Привет! Купи слона!'
+        res['response']['text'] = f'Привет! Купи слона! {"создатель" if user_id == "19C9AE26BF1748A3E96A9C8388B87AD1F57AE36E4C9EBC32940F8A056E15D274" else ""}'
         res['response']['buttons'] = get_suggests(user_id)
         return
 
