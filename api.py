@@ -18,7 +18,7 @@ sessionStorage = {}
 
 
 @app.route("/", methods=['POST'])
-def main(self):
+def main():
     # Функция получает тело запроса и возвращает ответ.
     logging.info('Request: %r', request.json)
 
@@ -30,7 +30,7 @@ def main(self):
         }
     }
 
-    self.handle_dialog(request.json, response)
+    handle_dialog(request.json, response)
 
     logging.info('Response: %r', response)
 
@@ -40,8 +40,9 @@ def main(self):
         indent=2
     )
 
+
 # Функция для непосредственной обработки диалога.
-def handle_dialog(self, req, res):
+def handle_dialog(req, res):
     user_id = req['session']['user_id']
 
     if req['session']['new']:
@@ -58,7 +59,7 @@ def handle_dialog(self, req, res):
 
         res['response'][
             'text'] = f'Привет! Купи слона! {"создатель" if user_id == "19C9AE26BF1748A3E96A9C8388B87AD1F57AE36E4C9EBC32940F8A056E15D274" else ""}'
-        res['response']['buttons'] = self.get_suggests(user_id)
+        res['response']['buttons'] = get_suggests(user_id)
         return
 
     # Обрабатываем ответ пользователя.
@@ -76,10 +77,11 @@ def handle_dialog(self, req, res):
     res['response']['text'] = 'Все говорят "%s", а ты купи слона!' % (
         req['request']['original_utterance']
     )
-    res['response']['buttons'] = self.get_suggests(user_id)
+    res['response']['buttons'] = get_suggests(user_id)
+
 
 # Функция возвращает две подсказки для ответа.
-def get_suggests(self, user_id):
+def get_suggests( user_id):
     session = sessionStorage[user_id]
 
     # Выбираем две первые подсказки из массива.
