@@ -19,6 +19,11 @@ sessionStorage = {}
 
 class AliceBot:
     # Задаем параметры приложения Flask.
+    @app.route('/p')
+    def p(self):
+        return 'Hello'
+
+
     @app.route("/", methods=['POST'])
     def main(self):
         # Функция получает тело запроса и возвращает ответ.
