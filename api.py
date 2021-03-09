@@ -49,58 +49,15 @@ def handle_dialog(req, res):
         # Это новый пользователь.
         # Инициализируем сессию и поприветствуем его.
 
-        sessionStorage[user_id] = {
-            'suggests': [
-                "Не хочу.",
-                "Не буду.",
-                "Отстань!",
-            ]
-        }
-
-        res['response'][
-            'text'] = f'Привет! Купи слона! {"создатель" if user_id == "19C9AE26BF1748A3E96A9C8388B87AD1F57AE36E4C9EBC32940F8A056E15D274" else ""}'
-        res['response']['buttons'] = get_suggests(user_id)
+        res['response']['text'] = f'Привет! Ты можешь создать напоминание с помощью команды ' + \
+                                  '"Алиса, создай напоминание на дата время, текст напоминания"'
         return
 
     # Обрабатываем ответ пользователя.
-    if req['request']['original_utterance'].lower() in [
-        'ладно',
-        'куплю',
-        'покупаю',
-        'хорошо',
-    ]:
+    if req['request']['command'].lower().startwith('алиса создай напоминание'):
         # Пользователь согласился, прощаемся.
-        res['response']['text'] = 'Слона можно найти на Яндекс.Маркете!'
+        res['response']['text'] = 'Отличное напоминание!'
+        print('создать напоминание:', req['request']['command'][24:])
         return
-
-    # Если нет, то убеждаем его купить слона!
-    res['response']['text'] = 'Все говорят "%s", а ты купи слона!' % (
-        req['request']['original_utterance']
-    )
-    res['response']['buttons'] = get_suggests(user_id)
-
-
-# Функция возвращает две подсказки для ответа.
-def get_suggests( user_id):
-    session = sessionStorage[user_id]
-
-    # Выбираем две первые подсказки из массива.
-    suggests = [
-        {'title': suggest, 'hide': True}
-        for suggest in session['suggests'][:2]
-    ]
-
-    # Убираем первую подсказку, чтобы подсказки менялись каждый раз.
-    session['suggests'] = session['suggests'][1:]
-    sessionStorage[user_id] = session
-
-    # Если осталась только одна подсказка, предлагаем подсказку
-    # со ссылкой на Яндекс.Маркет.
-    if len(suggests) < 2:
-        suggests.append({
-            "title": "Ладно",
-            "url": "https://market.yandex.ru/search?text=слон",
-            "hide": True
-        })
-
-    return suggests
+    else:
+        res['response']['text'] = 'Я вас не поняла, пожалуйста, переформулируйте запрос'
