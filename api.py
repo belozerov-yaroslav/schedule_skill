@@ -54,10 +54,11 @@ def handle_dialog(req, res):
         return
 
     # Обрабатываем ответ пользователя.
-    if req['request']['command'].lower().startwith('алиса создай напоминание'):
+    if req['request']['command'].lower().startswith('алиса создай напоминание'):
         # Пользователь согласился, прощаемся.
         res['response']['text'] = 'Отличное напоминание!'
         print('создать напоминание:', req['request']['command'][24:])
         return
     else:
         res['response']['text'] = 'Я вас не поняла, пожалуйста, переформулируйте запрос'
+        return
