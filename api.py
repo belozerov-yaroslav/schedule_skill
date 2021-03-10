@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 import json
 import logging
 
+from datetime import datetime
+
 # Импортируем подмодули Flask для запуска веб-сервиса.
 from flask import Flask, request
 
@@ -55,8 +57,27 @@ def handle_dialog(req, res):
 
     # Обрабатываем ответ пользователя.
     if req['request']['command'].lower().startswith('алиса создай напоминание'):
-        # Пользователь согласился, прощаемся.
-        res['response']['text'] = 'Отличное напоминание!'
+
+        dt = {"value": {"day": 1, "day_is_relative": True}}  # default
+        entities = req['request']['nlu']['entities']
+        for i in entities:
+            if i['type'] == 'YANDEX.DATETIME':  # если API нашли какую-то дату
+                dt = i
+                break
+        now = datetime.now()
+        args = []
+        for i in ['year', 'month', 'day', 'hour', 'minute', 'second']:
+            if dt['value'].get(i, 0) != 0:
+                if dt['value'][i + '_is_relative']:
+                    args.append(eval(f'now.{i} + entities["value"][i]'))
+                else:
+                    args.append(dt['value'][i])
+            else:
+                args.append(eval(f'now.{i}'))
+        n = datetime(*args)
+        print(now)
+        print(n)
+        res['response']['text']= f'Отличное напоминание! на {n.strftime()}'
         print('создать напоминание:', req['request']['command'][24:])
         return
     else:
