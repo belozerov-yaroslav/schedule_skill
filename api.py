@@ -69,7 +69,10 @@ def handle_dialog(req, res):
         for i in ['year', 'month', 'day', 'hour', 'minute', 'second']:
             if dt['value'].get(i, 0) != 0:
                 if dt['value'][i + '_is_relative']:
-                    args.append(eval(f'now.{i} + entities["value"][i]'))
+                    print(eval(f'now.{i}'))
+                    print(dt["value"][i])
+                    args.append(eval(f'now.{i} + dt["value"][i]'))
+
                 else:
                     args.append(dt['value'][i])
             else:
@@ -77,7 +80,7 @@ def handle_dialog(req, res):
         n = datetime(*args)
         print(now)
         print(n)
-        res['response']['text']= f'Отличное напоминание! на {n.strftime()}'
+        res['response']['text'] = f'Отличное напоминание! на {n.strftime("%m/%d/%Y, %H:%M:%S")}'
         print('создать напоминание:', req['request']['command'][24:])
         return
     else:
