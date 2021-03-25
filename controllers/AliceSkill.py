@@ -60,4 +60,5 @@ def handle_dialog(message):
         return
     else:
         message.set_text('Я вас не поняла, пожалуйста, переформулируйте запрос')
+        message.set_tts('Я вас не поняла, пожалуйста, переформулируйте запрос')
         return
