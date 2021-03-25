@@ -1,0 +1,2 @@
+class NoTimeException(Exception):
+    pass
