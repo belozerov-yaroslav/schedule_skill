@@ -59,6 +59,6 @@ def handle_dialog(message):
         message.set_text(f'Отличное напоминание! на {time.strftime("%m/%d/%Y, %H:%M:%S")}')
         return
     else:
-        message.set_text('Я вас не поняла, пожалуйста, переформулируйте запрос')
+        message.set_text('Я вас не поняла, пожалуйста, переформулируйте запрос, да да')
         message.set_tts('Я вас не поняла, пожалуйста, переформулируйте запрос')
         return
