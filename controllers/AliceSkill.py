@@ -62,3 +62,7 @@ def handle_dialog(message):
         message.set_text('Я вас не поняла, пожалуйста, переформулируйте запрос, да да')
         message.set_tts('Я вас не поняла, пожалуйста, переформулируйте запрос')
         return
+
+
+if __name__ == '__main__':
+    app.run()

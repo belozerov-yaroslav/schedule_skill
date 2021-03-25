@@ -18,9 +18,9 @@ class Message:
         response = {
             "version": self.message['version'],
             "session": self.message['session'],
-            "text": self.text,
-            "tts": self.tts,
             "response": {
+                "text": self.text,
+                "tts": self.tts,
                 "end_session": self.is_end
             }
         }
