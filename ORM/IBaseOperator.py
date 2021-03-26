@@ -49,3 +49,7 @@ class IBaseOperator(ABC):
     @abstractmethod
     def delete_old_users(self):
         pass
+
+    @abstractmethod
+    def update_user_info(self, user):
+        pass

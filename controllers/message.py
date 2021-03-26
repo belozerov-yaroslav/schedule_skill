@@ -59,8 +59,8 @@ class Message:
                 args.append(eval(f'now.{i}'))
         return datetime(*args)
 
-    def get_user_id(self):
-        return self.session['user_id']
+    def user_id(self):
+        return int(self.session['user_id'])
 
     def is_new_session(self):
         return self.session['new']

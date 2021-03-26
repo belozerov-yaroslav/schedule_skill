@@ -1,6 +1,7 @@
 from IBaseOperator import IBaseOperator
 from data import db_session
 from data.users import User
+import datetime
 
 
 class SqlalchemyOperator(IBaseOperator):
@@ -57,3 +58,11 @@ class SqlalchemyOperator(IBaseOperator):
 
     def delete_old_users(self):
         pass
+
+    def update_user_info(self, user: User):
+        db_sess = db_session.create_session()
+        user.last_visit = datetime.datetime.now()
+        user.num_of_vis += 1
+        db_sess.add(user)
+        db_sess.commit()
+        db_sess.close()
