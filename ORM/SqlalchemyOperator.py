@@ -1,6 +1,6 @@
-from IBaseOperator import IBaseOperator
-from data import db_session
-from data.users import User
+from .IBaseOperator import IBaseOperator
+from .data import db_session
+from .data.users import User
 import datetime
 
 
@@ -10,13 +10,13 @@ class SqlalchemyOperator(IBaseOperator):
 
     def add_user(self, user_id):
         db_sess = db_session.create_session()
-        db_sess.add(User(id=user_id))
+        db_sess.add(User(yandex_id=user_id))
         db_sess.commit()
         db_sess.close()
 
-    def get_user(self, user_id):
+    def get_user(self, yandex_id):
         db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.id == user_id).one()
+        user = db_sess.query(User).filter(User.yandex_id == yandex_id).one()
         db_sess.close()
         return user
 
@@ -42,9 +42,9 @@ class SqlalchemyOperator(IBaseOperator):
         users = db_session.create_session().query(User).all()
         return users
 
-    def user_is_created(self, user_id):
+    def user_is_created(self, yandex_id):
         db_sess = db_session.create_session()
-        if len(db_sess.query(User).filter(User.id == user_id).all()):
+        if len(db_sess.query(User).filter(User.yandex_id == yandex_id).all()):
             db_sess.close()
             return True
         db_sess.close()

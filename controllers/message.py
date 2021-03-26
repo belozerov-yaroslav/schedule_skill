@@ -60,7 +60,7 @@ class Message:
         return datetime(*args)
 
     def user_id(self):
-        return int(self.session['user_id'])
+        return self.session['user_id']
 
     def is_new_session(self):
         return self.session['new']

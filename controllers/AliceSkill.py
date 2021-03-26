@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from exceptions import *
 from message import Message
+from UseCases.NewSessionUC import NewSessionUC
 
 # Импортируем модули для работы с JSON и логами.
 import json
@@ -42,10 +43,8 @@ def main():
 # Функция для непосредственной обработки диалога.
 def handle_dialog(message):
     if message.is_new_session():
-        # Это новая сессия
-
-        message.set_text(f'Привет! Ты можешь создать напоминание с помощью команды ' +
-                         '"Алиса, создай напоминание на дата время, текст напоминания"')
+        # новая сессия
+        NewSessionUC(message).handle()
         return
 
     # Обрабатываем ответ пользователя.
