@@ -62,7 +62,7 @@ class Message:
     def get_user_id(self):
         return self.session['user_id']
 
-    def is_new_user(self):
+    def is_new_session(self):
         return self.session['new']
 
     def set_text(self, text: str):
