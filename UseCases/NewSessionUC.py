@@ -1,12 +1,9 @@
 from ORM.SqlalchemyOperator import SqlalchemyOperator
 from controllers.message import Message
+from UseCases.UseCase import UseCase
 
 
-class NewSessionUC:
-    def __init__(self, message: Message):
-        self.message = message
-        self.repository = SqlalchemyOperator('../ORM/db/schedule.db')
-
+class NewSessionUC(UseCase):
     def new_user(self):
         self.message.set_text(f'Привет! Ты можешь создать напоминание с помощью команды ' +
                               '"Алиса, создай напоминание на дата время, текст напоминания"')

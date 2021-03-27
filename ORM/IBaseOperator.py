@@ -53,3 +53,7 @@ class IBaseOperator(ABC):
     @abstractmethod
     def update_user_info(self, user):
         pass
+
+    @abstractmethod
+    def add_event(self, event):
+        pass

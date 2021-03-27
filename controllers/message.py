@@ -77,3 +77,15 @@ class Message:
     def set_is_end(self, is_end):
         self.is_end = is_end
 
+    def split_by_date(self):
+        entities = self.request['nlu']['entities']
+        for i in entities:
+            if i['type'] == 'YANDEX.DATETIME':  # если API нашли какую-то дату
+                dt = i
+                break
+        else:  # нет даты, бросаем ошибку
+            return self.get_cmd()
+        return [self.request['nlu']['tokens'][:int(dt['tokens']['start'])]] + \
+               [self.request['nlu']['tokens'][int(dt['tokens']['start']):int(dt['tokens']['end'])]] + \
+               [self.request['nlu']['tokens'][int(dt['tokens']['end']):]]
+

@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from exceptions import *
 from message import Message
 from UseCases.NewSessionUC import NewSessionUC
+from UseCases.CreateEventUC import CreateEventUC
 
 # Импортируем модули для работы с JSON и логами.
 import json
@@ -50,14 +51,15 @@ def handle_dialog(message):
     # Обрабатываем ответ пользователя.
     if message.get_cmd().lower().startswith('алиса создай напоминание'):
         try:
-            time = message.get_datetime()
+            event_time, event_text = CreateEventUC(message).create()
         except NoTimeException:
             message.set_text('Извините, я не поняла на какое время вы хотите установить напоминание')
             return
-        message.set_text(f'Отличное напоминание! на {time.strftime("%m/%d/%Y, %H:%M:%S")}')
+        message.set_text(f'''Отличное напоминание! на {event_time.strftime("%m/%d/%Y, %H:%M:%S")}
+        вы хотите {event_text}?''')
         return
     else:
-        message.set_text('Я вас не поняла, пожалуйста, переформулируйте запрос, да да')
+        message.set_text('Я вас не поняла, пожалуйста, переформулируйте запрос')
         message.set_tts('Я вас не поняла, пожалуйста, переформулируйте запрос')
         return
 

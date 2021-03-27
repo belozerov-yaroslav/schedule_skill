@@ -66,3 +66,9 @@ class SqlalchemyOperator(IBaseOperator):
         db_sess.add(user)
         db_sess.commit()
         db_sess.close()
+
+    def add_event(self, event):
+        db_sess = db_session.create_session()
+        db_sess.add(event)
+        db_sess.commit()
+        db_sess.close()

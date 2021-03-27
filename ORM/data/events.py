@@ -10,7 +10,7 @@ class Event(SqlAlchemyBase):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now, nullable=False)
-    periodcity = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    periodicity = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False)
     user = orm.relation('User')
     text = sqlalchemy.Column(sqlalchemy.Text, nullable=False)

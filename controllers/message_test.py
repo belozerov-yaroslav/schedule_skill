@@ -1,5 +1,7 @@
 import pytest
 from datetime import datetime
+
+
 # from message import Message
 
 
@@ -10,22 +12,25 @@ class Message:
         self.meta = message['meta']
         self.session = message['session']
         self.version = message['version']
+        self.text = ''
+        self.tts = ''
+        self.buttons = []
+        self.is_end = False
 
-    def build_response(self, text, tts=None, buttons=None, is_end=False):
-        #  text - видит пользователь на экране
-        #  tts - произносит алиса
+    def build_response(self):
         response = {
             "version": self.message['version'],
             "session": self.message['session'],
-            "text": text,
             "response": {
-                "end_session": is_end
+                "text": self.text,
+                "tts": self.tts,
+                "end_session": self.is_end
             }
         }
-        if tts is not None:
-            response["tts"] = tts
-        if buttons is not None:
-            response["buttons"] = buttons
+        if self.tts:
+            response["tts"] = self.tts
+        if self.buttons:
+            response["buttons"] = self.buttons
         return response
 
     def get_cmd(self):
@@ -56,6 +61,36 @@ class Message:
             else:
                 args.append(eval(f'now.{i}'))
         return datetime(*args)
+
+    def user_id(self):
+        return self.session['user_id']
+
+    def is_new_session(self):
+        return self.session['new']
+
+    def set_text(self, text: str):
+        self.text = text
+
+    def set_tts(self, tts: str):
+        self.tts = tts
+
+    def buttons(self, buttons: list):
+        self.buttons = buttons
+
+    def set_is_end(self, is_end):
+        self.is_end = is_end
+
+    def split_by_date(self):
+        entities = self.request['nlu']['entities']
+        for i in entities:
+            if i['type'] == 'YANDEX.DATETIME':  # если API нашли какую-то дату
+                dt = i
+                break
+        else:  # нет даты, бросаем ошибку
+            return self.get_cmd()
+        return [self.request['nlu']['tokens'][:int(dt['tokens']['start'])]] + \
+               [self.request['nlu']['tokens'][int(dt['tokens']['start']):int(dt['tokens']['end'])]] + \
+               [self.request['nlu']['tokens'][int(dt['tokens']['end']):]]
 
 
 message = \
@@ -143,7 +178,8 @@ mes = Message(message=message)
 
 
 def build():
-    print(mes.build_response('ПРИВЕТ'))
+    print(mes.build_response())
+
 
 build()
 
@@ -163,3 +199,11 @@ def test_is_dangerous():
 def test_time():
     now = datetime.now()
     assert mes.get_datetime() == datetime(2021, 4, 10, now.hour, now.minute, now.second)
+
+
+def test_split():
+    assert mes.split_by_date() == [["алиса", "создай", "напоминание", "на"], ["10", "апреля"], ["купить", "сырков"]]
+    print(mes.split_by_date())
+
+
+test_split()
