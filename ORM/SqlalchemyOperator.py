@@ -1,6 +1,7 @@
 from .IBaseOperator import IBaseOperator
 from .data import db_session
 from .data.users import User
+from .data.events import Event
 import datetime
 
 
@@ -36,7 +37,10 @@ class SqlalchemyOperator(IBaseOperator):
         db_sess.close()
 
     def get_user_events(self, user):
-        pass
+        db_sess = db_session.create_session()
+        events = db_sess.query(Event).filter(Event.user == user).all()
+        db_sess.close()
+        return events
 
     def get_users(self):
         users = db_session.create_session().query(User).all()

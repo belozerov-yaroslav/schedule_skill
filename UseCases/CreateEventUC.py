@@ -7,6 +7,21 @@ from datetime import datetime
 
 class CreateEventUC(UseCase):
     def create(self):
+        cmd = self.message.get_cmd().split()
+        if any(map(lambda x: x in cmd, ['каждый', 'каждую', 'каждое'])):
+            return self.every_week_day()
+        else:
+            return self.simple_event()
+
+    def every_week_day(self):
+        cmd = self.message.get_cmd().split()
+        for word in ['каждый', 'каждую', 'каждое']:
+            if word in cmd:
+                break
+        week_day = cmd[cmd.index(word) + 1]
+        return datetime.now(), week_day
+
+    def simple_event(self):
         event_time = self.message.get_datetime()
         event_text = self.get_event_text()
         event = Event(date=event_time,

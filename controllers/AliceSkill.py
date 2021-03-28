@@ -6,6 +6,7 @@ from exceptions import *
 from message import Message
 from UseCases.NewSessionUC import NewSessionUC
 from UseCases.CreateEventUC import CreateEventUC
+from UseCases.GetEventsUC import GetEventsUC
 
 # Импортируем модули для работы с JSON и логами.
 import json
@@ -57,6 +58,12 @@ def handle_dialog(message):
             return
         message.set_text(f'''Отличное напоминание! на {event_time.strftime("%m/%d/%Y, %H:%M:%S")}
         вы хотите {event_text}?''')
+        return
+    elif message.get_cmd().startswith('алиса что у меня запланировано'):
+        try:
+            message.set_text('Вы хотели:\n' + '\n'.join(GetEventsUC(message).get()))
+        except NoTimeException:
+            message.set_text('Извините, я не поняла того, на какой день вы хотите узнать напоминания.')
         return
     else:
         message.set_text('Я вас не поняла, пожалуйста, переформулируйте запрос')
