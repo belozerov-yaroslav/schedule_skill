@@ -2,6 +2,7 @@ from .IBaseOperator import IBaseOperator
 from .data import db_session
 from .data.users import User
 from .data.events import Event
+from .data.event_descriptions import EventDescription
 import datetime
 
 
@@ -71,8 +72,18 @@ class SqlalchemyOperator(IBaseOperator):
         db_sess.commit()
         db_sess.close()
 
-    def add_event(self, event):
+    def add_event(self, event, event_description=None):
         db_sess = db_session.create_session()
         db_sess.add(event)
+        if not event_description is None:
+            event_description.event = event
+            db_sess.add(event_description)
+            print(event_description)
         db_sess.commit()
         db_sess.close()
+
+    def get_event_description(self, event):
+        db_sess = db_session.create_session()
+        event_description = db_sess.query(EventDescription).filter(EventDescription.event == event).one()
+        db_sess.close()
+        return event_description

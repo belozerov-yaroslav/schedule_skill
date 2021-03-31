@@ -1,8 +1,10 @@
 from ORM.SqlalchemyOperator import SqlalchemyOperator
 from ORM.data.events import Event
+from ORM.data.event_descriptions import EventDescription
 from controllers.message import Message
 from UseCases.UseCase import UseCase
 from datetime import datetime
+from exceptions import *
 
 
 class CreateEventUC(UseCase):
@@ -19,7 +21,15 @@ class CreateEventUC(UseCase):
             if word in cmd:
                 break
         week_day = cmd[cmd.index(word) + 1]
-        return datetime.now(), week_day
+        for name, day_count in zip(['пон', 'вто', 'сре', 'чет', 'пят', 'суб', 'вос'], range(1, 8)):
+            if week_day.startswith(name):
+                break
+        else:
+            raise NoWeekDay
+        self.repository.add_event(Event(periodicity=2, text=self.get_event_text(), date=self.message.get_datetime(),
+                                        user=self.repository.get_user(self.message.user_id())),
+                                  event_description=EventDescription(text=str(day_count)))
+        return datetime.now(), day_count
 
     def simple_event(self):
         event_time = self.message.get_datetime()
