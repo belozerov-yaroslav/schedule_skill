@@ -11,13 +11,14 @@ class GetEventsUC(UseCase):
         return self.get_by_date(events)
 
     def get_by_date(self, events):
+        print(self.periodicity_by_weekday(events))
         return list(map(lambda x: x.text, self.simple_periodicity(events) + self.periodicity_by_weekday(events)))
 
     def periodicity_by_weekday(self, events):
         date = self.message.get_datetime()
         needed_events_by_weekday = filter(lambda x: x.periodicity == 2 and
-                                                    date.weekday ==
-                                                    int(self.repository.get_event_description(x).text) - 1,
+                                                    int(self.repository.get_event_description(x).text) - 1 ==
+                                                    date.weekday(),
                                           events)
         return list(needed_events_by_weekday)
 
