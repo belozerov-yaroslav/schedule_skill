@@ -11,8 +11,9 @@ class GetEventsUC(UseCase):
         return self.get_by_date(events)
 
     def get_by_date(self, events):
-        print(self.periodicity_by_weekday(events))
-        return list(map(lambda x: x.text, self.simple_periodicity(events) + self.periodicity_by_weekday(events)))
+        return list(map(lambda x: str(x.date.hour) + ':' + str(x.date.minute).rjust(2, '0') + ' ' + x.text,
+                        sorted(self.simple_periodicity(events) + self.periodicity_by_weekday(events),
+                               key=lambda x: x.date)))
 
     def periodicity_by_weekday(self, events):
         date = self.message.get_datetime()
