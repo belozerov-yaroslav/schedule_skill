@@ -5,8 +5,10 @@ from UseCases.UseCase import UseCase
 
 class NewSessionUC(UseCase):
     def new_user(self):
-        self.message.set_text(f'Привет! Вы можете создать напоминание с помощью команды ' +
-                              '"Алиса, создай напоминание на дата время, текст напоминания"')
+        self.message.set_text('''Привет! Вы можете создать напоминание с помощью команды
+                              "Алиса, создай напоминание на дата время, текст напоминания"
+                              Если вы хотите узнать, что у вас запланировано на день, то попросите:
+                            "Алиса, что у меня запланировано на дата"''')
         self.repository.add_user(self.message.user_id())
 
     def old_user(self):

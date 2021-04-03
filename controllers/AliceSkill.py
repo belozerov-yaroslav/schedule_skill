@@ -56,7 +56,7 @@ def handle_dialog(message):
         except NoTimeException:
             message.set_text('Извините, я не поняла на какое время вы хотите установить напоминание')
             return
-        message.set_text(f'''Отличное напоминание! на {event_time.strftime("%m/%d/%Y, %H:%M:%S")}
+        message.set_text(f'''Отличное напоминание! на {event_time.strftime("%d/%m/%Y, %H:%M:%S")}
         вы хотите {event_text}?''')
         return
     elif message.get_cmd().startswith('алиса что у меня запланировано'):
@@ -65,6 +65,8 @@ def handle_dialog(message):
         except NoTimeException:
             message.set_text('Извините, я не поняла того, на какой день вы хотите узнать напоминания.')
         return
+    elif message.get_cmd().startswith('спасибо'):
+        message.set_text('Незачто')
     else:
         message.set_text('Я вас не поняла, пожалуйста, переформулируйте запрос')
         message.set_tts('Я вас не поняла, пожалуйста, переформулируйте запрос')

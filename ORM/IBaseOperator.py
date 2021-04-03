@@ -57,3 +57,7 @@ class IBaseOperator(ABC):
     @abstractmethod
     def add_event(self, event):
         pass
+
+    @abstractmethod
+    def get_event_description(self, event):
+        pass
