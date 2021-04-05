@@ -6,9 +6,23 @@ from .data.event_descriptions import EventDescription
 import datetime
 
 
+def decorate_test(func):
+
+    def decorated(*args, **kwargs):
+        db_sess = db_session.create_session()
+        res = func(*args, db_sess=db_sess, **kwargs)
+        db_sess.close()
+        return res
+
+    return decorated
+
+
 class SqlalchemyOperator(IBaseOperator):
     def __init__(self, repository_name):
         db_session.global_init(repository_name)
+
+    def test(self, func):
+        pass
 
     def add_user(self, user_id):
         db_sess = db_session.create_session()
@@ -16,10 +30,9 @@ class SqlalchemyOperator(IBaseOperator):
         db_sess.commit()
         db_sess.close()
 
-    def get_user(self, yandex_id):
-        db_sess = db_session.create_session()
+    @decorate_test
+    def get_user(self, yandex_id, db_sess=None):
         user = db_sess.query(User).filter(User.yandex_id == yandex_id).one()
-        db_sess.close()
         return user
 
     def delete_user(self, user):
