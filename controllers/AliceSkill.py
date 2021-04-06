@@ -1,21 +1,26 @@
 # coding: utf-8
 # Импортирует поддержку UTF-8.
 from __future__ import unicode_literals
-
 from exceptions import *
 from message import Message
 from UseCases.NewSessionUC import NewSessionUC
 from UseCases.CreateEventUC import CreateEventUC
 from UseCases.GetEventsUC import GetEventsUC
-
-# Импортируем модули для работы с JSON и логами.
 import json
 import logging
-
 from datetime import datetime
-
-# Импортируем подмодули Flask для запуска веб-сервиса.
 from flask import Flask, request
+
+
+def had_cmd(message: str, cmd_list):
+    if isinstance(cmd_list, list):
+        for cmd in cmd_list:
+            if message.startswith(cmd):
+                return True
+        return False
+    else:
+        return message.startswith(cmd_list)
+
 
 app = Flask(__name__)
 
@@ -48,9 +53,8 @@ def handle_dialog(message):
         # новая сессия
         NewSessionUC(message).handle()
         return
-
     # Обрабатываем ответ пользователя.
-    if message.get_cmd().lower().startswith('алиса создай напоминание'):
+    if had_cmd(message.get_cmd().lower(), ['алиса создай напоминание', 'создай напоминание']):
         try:
             event_time, event_text = CreateEventUC(message).create()
         except NoTimeException:
@@ -59,17 +63,17 @@ def handle_dialog(message):
         message.set_text(f'''Отличное напоминание! на {event_time.strftime("%d/%m/%Y, %H:%M:%S")}
         вы хотите {event_text}?''')
         return
-    elif message.get_cmd().startswith('алиса что у меня запланировано'):
+    elif had_cmd(message.get_cmd(), ['алиса что у меня запланировано', 'что у меня запланировано',
+                                     'что запланировано']):
         try:
             message.set_text('Вы хотели:\n' + '\n'.join(GetEventsUC(message).get()))
         except NoTimeException:
             message.set_text('Извините, я не поняла того, на какой день вы хотите узнать напоминания.')
         return
-    elif message.get_cmd().startswith('спасибо'):
+    elif had_cmd(message.get_cmd(), ['спасибо', 'благодарю', 'понял']):
         message.set_text('Незачто')
     else:
         message.set_text('Я вас не поняла, пожалуйста, переформулируйте запрос')
-        message.set_tts('Я вас не поняла, пожалуйста, переформулируйте запрос')
         return
 
 

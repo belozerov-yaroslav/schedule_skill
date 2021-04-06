@@ -19,10 +19,6 @@ class IBaseOperator(ABC):
         pass
 
     @abstractmethod
-    def add_user_event(self, user, date, text, periodicity=0, extra_text=''):
-        pass
-
-    @abstractmethod
     def delete_user_event(self, event):
         pass
 
@@ -36,10 +32,6 @@ class IBaseOperator(ABC):
 
     @abstractmethod
     def user_is_created(self, user_id):
-        pass
-
-    @abstractmethod
-    def get_real_time(self, datetime):
         pass
 
     @abstractmethod
