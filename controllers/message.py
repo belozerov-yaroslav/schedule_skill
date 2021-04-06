@@ -48,6 +48,7 @@ class Message:
         else:  # нет даты, бросаем ошибку
             raise NoTimeException
         now = datetime.now()  # переменная используется(не верить IDE)
+        now = now.replace(minute=0, second=0)
         args = []
         for i in ['year', 'month', 'day', 'hour', 'minute', 'second']:
             if dt['value'].get(i, 0) != 0:

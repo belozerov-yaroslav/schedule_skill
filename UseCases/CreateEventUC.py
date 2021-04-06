@@ -29,7 +29,8 @@ class CreateEventUC(UseCase):
         self.repository.add_event(Event(periodicity=2, text=self.get_event_text(), date=self.message.get_datetime(),
                                         user=self.repository.get_user(self.message.user_id())),
                                   event_description=EventDescription(text=str(day_count)))
-        return datetime.now(), day_count
+        return f'каждый {day_count} день, {str(self.message.get_datetime().hour).rjust(2, "0")}:' + \
+               f'{str(self.message.get_datetime().minute).rjust(2, "0")}', self.get_event_text()
 
     def simple_event(self):
         event_time = self.message.get_datetime()
@@ -39,7 +40,7 @@ class CreateEventUC(UseCase):
                       user=self.repository.get_user(self.message.user_id()),
                       text=event_text)
         self.save_event(event)
-        return event_time, event_text
+        return event_time.strftime("%d/%m/%Y, %H:%M:%S"), event_text
 
     def get_event_text(self):
         event_text = ' '.join(self.message.split_by_date()[-1])
