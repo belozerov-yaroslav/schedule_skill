@@ -9,7 +9,7 @@
   "routes": [
     {
       "src": "(.*)",
-      "dest": "controllers\\AliceSkill.py"
+      "dest": "controllers/AliceSkill.py"
     }
   ]
 }
