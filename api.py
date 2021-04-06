@@ -25,6 +25,11 @@ logging.basicConfig(level=logging.DEBUG)
 sessionStorage = {}
 
 
+@app.route('/post')
+def post():
+    return 'ONLINE!!!'
+
+
 @app.route("/", methods=['POST'])
 def main():
     # Функция получает тело запроса и возвращает ответ.
