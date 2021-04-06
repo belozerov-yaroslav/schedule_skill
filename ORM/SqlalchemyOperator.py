@@ -21,9 +21,6 @@ class SqlalchemyOperator(IBaseOperator):
     def __init__(self, repository_name):
         db_session.global_init(repository_name)
 
-    def test(self, func):
-        pass
-
     def add_user(self, user_id):
         db_sess = db_session.create_session()
         db_sess.add(User(yandex_id=user_id))
