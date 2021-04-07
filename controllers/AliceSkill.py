@@ -6,6 +6,7 @@ from message import Message
 from UseCases.NewSessionUC import NewSessionUC
 from UseCases.CreateEventUC import CreateEventUC
 from UseCases.GetEventsUC import GetEventsUC
+from UseCases.ConfirmAddUC import ConfirmAddUC
 import json
 import logging
 from datetime import datetime
@@ -50,13 +51,19 @@ def main():
 # Функция для непосредственной обработки диалога.
 def handle_dialog(message):
     if message.is_new_session():
+        sessionStorage[message.session['session_id']] = {'wait_for_confirm': False}
         # новая сессия
         NewSessionUC(message).handle()
         return
+    if message.session['session_id'] not in sessionStorage.keys():
+        sessionStorage[message.session['session_id']] = {'wait_for_confirm': False}
     # Обрабатываем ответ пользователя.
+    if sessionStorage[message.session['session_id']]['wait_for_confirm']:
+        ConfirmAddUC(message).confirm(sessionStorage)
+        return
     if had_cmd(message.get_cmd().lower(), ['алиса создай напоминание', 'создай напоминание']):
         try:
-            event_time, event_text = CreateEventUC(message).create()
+            event_time, event_text, event = CreateEventUC(message).create()
         except NoTimeException:
             message.set_text('Извините, я не поняла на какое время вы хотите установить напоминание')
             return
@@ -64,6 +71,8 @@ def handle_dialog(message):
             message.set_text('Извините, я не поняла на какое день вы хотите установить напоминание')
             return
         message.set_text(f'''Отличное напоминание! на {event_time}, вы хотите {event_text}?''')
+        sessionStorage[message.session['session_id']]['wait_for_confirm'] = True
+        sessionStorage[message.session['session_id']]['event'] = event
         return
     elif had_cmd(message.get_cmd(), ['алиса что у меня запланировано', 'что у меня запланировано',
                                      'что запланировано']):
