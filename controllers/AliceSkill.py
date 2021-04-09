@@ -7,6 +7,7 @@ from UseCases.NewSessionUC import NewSessionUC
 from UseCases.CreateEventUC import CreateEventUC
 from UseCases.GetEventsUC import GetEventsUC
 from UseCases.ConfirmAddUC import ConfirmAddUC
+from controllers.sessionStorage import SessionStorage
 import json
 import logging
 from datetime import datetime
@@ -28,7 +29,7 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
 # Хранилище данных о сессиях.
-sessionStorage = {}
+sessionStorage = SessionStorage()
 
 
 @app.route("/", methods=['POST'])
@@ -51,15 +52,13 @@ def main():
 # Функция для непосредственной обработки диалога.
 def handle_dialog(message):
     if message.is_new_session():
-        sessionStorage[message.session['session_id']] = {'wait_for_confirm': False}
+        sessionStorage.add_session(message.session_id())
         # новая сессия
         NewSessionUC(message).handle()
         return
-    if message.session['session_id'] not in sessionStorage.keys():
-        sessionStorage[message.session['session_id']] = {'wait_for_confirm': False}
     # Обрабатываем ответ пользователя.
-    if sessionStorage[message.session['session_id']]['wait_for_confirm']:
-        ConfirmAddUC(message).confirm(sessionStorage)
+    if sessionStorage.is_wait_for_confirm(message.session_id()):
+        ConfirmAddUC(message).handle(sessionStorage)
         return
     if had_cmd(message.get_cmd().lower(), ['алиса создай напоминание', 'создай напоминание']):
         try:
@@ -71,8 +70,7 @@ def handle_dialog(message):
             message.set_text('Извините, я не поняла на какое день вы хотите установить напоминание')
             return
         message.set_text(f'''Отличное напоминание! на {event_time}, вы хотите {event_text}?''')
-        sessionStorage[message.session['session_id']]['wait_for_confirm'] = True
-        sessionStorage[message.session['session_id']]['event'] = event
+        sessionStorage.set_confirm(message.session_id(), event)
         return
     elif had_cmd(message.get_cmd(), ['алиса что у меня запланировано', 'что у меня запланировано',
                                      'что запланировано']):

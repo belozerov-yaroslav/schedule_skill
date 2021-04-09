@@ -90,3 +90,6 @@ class Message:
                [self.request['nlu']['tokens'][int(dt['tokens']['start']):int(dt['tokens']['end'])]] + \
                [self.request['nlu']['tokens'][int(dt['tokens']['end']):]]
 
+    def session_id(self):
+        return self.session['session_id']
+
