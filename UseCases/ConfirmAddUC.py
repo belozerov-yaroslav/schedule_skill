@@ -2,6 +2,7 @@ from random import choice
 
 from ORM.SqlalchemyOperator import SqlalchemyOperator
 from controllers.message import Message
+from controllers.button import Button
 from controllers.sessionStorage import SessionStorage
 from UseCases.UseCase import UseCase
 
@@ -27,3 +28,5 @@ class ConfirmAddUC(UseCase):
             sessionStorage.delete_confirm(self.message.session_id())
         else:
             self.message.set_text('Пожалуйста, подтвердите добавление напоминания.')
+            self.message.clear_buttons()
+            self.message.add_buttons([Button('Да'), Button('Нет')])

@@ -20,14 +20,13 @@ class Message:
             "session": self.message['session'],
             "response": {
                 "text": self.text,
-                "tts": self.tts,
-                "end_session": self.is_end
+                "end_session": self.is_end,
             }
         }
         if self.tts:
-            response["tts"] = self.tts
+            response['response']["tts"] = self.tts
         if self.buttons:
-            response["buttons"] = self.buttons
+            response['response']["buttons"] = [button.build() for button in self.buttons]
         return response
 
     def get_cmd(self):
@@ -72,8 +71,8 @@ class Message:
     def set_tts(self, tts: str):
         self.tts = tts
 
-    def buttons(self, buttons: list):
-        self.buttons = buttons
+    def add_buttons(self, buttons: list):
+        self.buttons += buttons
 
     def set_is_end(self, is_end):
         self.is_end = is_end
@@ -93,3 +92,8 @@ class Message:
     def session_id(self):
         return self.session['session_id']
 
+    def add_button(self, button):
+        self.buttons.append(button)
+
+    def clear_buttons(self):
+        self.buttons = []

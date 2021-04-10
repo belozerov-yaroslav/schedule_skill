@@ -8,6 +8,7 @@ from UseCases.CreateEventUC import CreateEventUC
 from UseCases.GetEventsUC import GetEventsUC
 from UseCases.ConfirmAddUC import ConfirmAddUC
 from controllers.sessionStorage import SessionStorage
+from controllers.button import Button
 import json
 import logging
 from datetime import datetime
@@ -51,6 +52,7 @@ def main():
 
 # Функция для непосредственной обработки диалога.
 def handle_dialog(message):
+    message.add_button(Button('Помощь'))
     if message.is_new_session():
         sessionStorage.add_session(message.session_id())
         # новая сессия
@@ -60,7 +62,9 @@ def handle_dialog(message):
     if sessionStorage.is_wait_for_confirm(message.session_id()):
         ConfirmAddUC(message).handle(sessionStorage)
         return
-    if had_cmd(message.get_cmd().lower(), ['алиса создай напоминание', 'создай напоминание']):
+    elif had_cmd(message.get_cmd().lower(), ['алиса создай напоминание', 'создай напоминание',
+                                             'алиса напомни мне',
+                                             'напомни мне', 'алиса напомни', 'напомни']):
         try:
             event_time, event_text, event = CreateEventUC(message).create()
         except NoTimeException:
@@ -70,6 +74,8 @@ def handle_dialog(message):
             message.set_text('Извините, я не поняла на какое день вы хотите установить напоминание')
             return
         message.set_text(f'''Отличное напоминание! на {event_time}, вы хотите {event_text}?''')
+        message.clear_buttons()
+        message.add_buttons([Button('Да'), Button('Нет')])
         sessionStorage.set_confirm(message.session_id(), event)
         return
     elif had_cmd(message.get_cmd(), ['алиса что у меня запланировано', 'что у меня запланировано',
@@ -81,6 +87,9 @@ def handle_dialog(message):
         return
     elif had_cmd(message.get_cmd(), ['спасибо', 'благодарю', 'понял']):
         message.set_text('Незачто')
+    elif had_cmd(message.get_cmd(), ['помощь', 'помоги', 'помоги мне', 'что говорить']):
+        message.set_text(f'''Чтобы создать напоминание скажите: "создай напоминание на <дата время>, <>"''')
+        return
     else:
         message.set_text('Я вас не поняла, пожалуйста, переформулируйте запрос')
         return
