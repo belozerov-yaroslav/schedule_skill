@@ -21,7 +21,14 @@ class NewSessionUC(UseCase):
         self.repository.update_user_info(self.repository.get_user(self.message.user_id()))
 
     def handle(self):
-        if self.repository.user_is_created(self.message.user_id()):
+        try:
+            user_is_created = self.repository.user_is_created(self.message.user_id())
+        except KeyError:
+            self.message.set_text('''Извините, этот навык не поддерживает работу с анонимными пользователями, 
+            пожалуйста, автроизуйтесь в учетной записи и возращайтесь.''')
+            self.message.set_is_end(True)
+            return
+        if user_is_created:
             self.old_user()
         else:
             self.new_user()

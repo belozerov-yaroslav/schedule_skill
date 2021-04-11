@@ -9,21 +9,11 @@ from UseCases.GetEventsUC import GetEventsUC
 from UseCases.ConfirmAddUC import ConfirmAddUC
 from controllers.sessionStorage import SessionStorage
 from controllers.button import Button
+from controllers.had_cmd import had_cmd
+from random import choice
 import json
 import logging
-from datetime import datetime
 from flask import Flask, request
-
-
-def had_cmd(message: str, cmd_list):
-    if isinstance(cmd_list, list):
-        for cmd in cmd_list:
-            if message.startswith(cmd):
-                return True
-        return False
-    else:
-        return message.startswith(cmd_list)
-
 
 app = Flask(__name__)
 
@@ -62,9 +52,7 @@ def handle_dialog(message):
     if sessionStorage.is_wait_for_confirm(message.session_id()):
         ConfirmAddUC(message).handle(sessionStorage)
         return
-    elif had_cmd(message.get_cmd().lower(), ['алиса создай напоминание', 'создай напоминание',
-                                             'алиса напомни мне',
-                                             'напомни мне', 'алиса напомни', 'напомни']):
+    elif had_cmd(message.get_cmd().lower(), ['создай напоминание', 'напомни мне', 'напомни']):
         try:
             event_time, event_text, event = CreateEventUC(message).create()
         except NoTimeException:
@@ -78,17 +66,20 @@ def handle_dialog(message):
         message.add_buttons([Button('Да'), Button('Нет')])
         sessionStorage.set_confirm(message.session_id(), event)
         return
-    elif had_cmd(message.get_cmd(), ['алиса что у меня запланировано', 'что у меня запланировано',
-                                     'что запланировано']):
+    elif had_cmd(message.get_cmd(), ['что у меня запланировано', 'что запланировано']):
         try:
             message.set_text('Вы хотели:\n' + '\n'.join(GetEventsUC(message).get()))
         except NoTimeException:
             message.set_text('Извините, я не поняла того, на какой день вы хотите узнать напоминания.')
         return
     elif had_cmd(message.get_cmd(), ['спасибо', 'благодарю', 'понял']):
-        message.set_text('Незачто')
+        message.set_text(choice(['Незачто', 'Обращайтесь', 'Всегда готова вам помочь']))
     elif had_cmd(message.get_cmd(), ['помощь', 'помоги', 'помоги мне', 'что говорить']):
-        message.set_text(f'''Чтобы создать напоминание скажите: "создай напоминание на <дата время>, <>"''')
+        message.set_text(f'Чтобы создать напоминание скажите: "напомни на <дата время>, ' +
+                         '<текст напоминания>", ' +
+                         'обратите внимание, что обязательно вначале указать дату, ' +
+                         'а потом текст, именно в таком порядке.\n' +
+                         'Чтобы узнать, что вы запланировали, скажите "что запланировано на <дата>, <текст>"')
         return
     else:
         message.set_text('Я вас не поняла, пожалуйста, переформулируйте запрос')
