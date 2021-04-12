@@ -3,6 +3,7 @@ from ORM.data.events import Event
 from ORM.data.event_descriptions import EventDescription
 from controllers.message import Message
 from UseCases.UseCase import UseCase
+from controllers.button import Button
 from datetime import datetime
 from exceptions import *
 
@@ -10,10 +11,21 @@ from exceptions import *
 class CreateEventUC(UseCase):
     def create(self):
         cmd = self.message.get_cmd().split()
-        if any(map(lambda x: x in cmd, ['каждый', 'каждую', 'каждое'])):
-            return self.every_week_day()
-        else:
-            return self.simple_event()
+        try:
+            if any(map(lambda x: x in cmd, ['каждый', 'каждую', 'каждое'])):
+                event_time, event_text, event = self.every_week_day()
+            else:
+                event_time, event_text, event = self.simple_event()
+        except NoWeekDay:
+            self.message.set_text('Извините, я не поняла на какой день вы хотите установить напоминание')
+            return
+        except NoTimeException:
+            self.message.set_text('Извините, я не поняла на какое время вы хотите установить напоминание')
+            return
+        self.message.set_text(f'''Отличное напоминание! на {event_time}, вы хотите {event_text}?''')
+        self.message.clear_buttons()
+        self.message.add_buttons([Button('Да'), Button('Нет')])
+        self.session_storage.set_confirm(self.message.session_id(), event)
 
     def every_week_day(self):
         cmd = self.message.get_cmd().split()

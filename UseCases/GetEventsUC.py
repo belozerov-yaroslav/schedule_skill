@@ -2,18 +2,36 @@ from ORM.SqlalchemyOperator import SqlalchemyOperator
 from controllers.message import Message
 from UseCases.UseCase import UseCase
 from datetime import datetime
+from exceptions import *
 
 
 class GetEventsUC(UseCase):
     def get(self):
         user = self.repository.get_user(self.message.user_id())
-        events = self.repository.get_user_events(user)
-        return self.get_by_date(events)
+        all_events = self.repository.get_user_events(user)
+        try:
+            events = self.get_by_date(all_events)
+        except NoTimeException:
+            self.message.set_text('Извините, я не поняла того, на какой день вы хотите узнать напоминания.')
+            return
+        time_now = datetime.now()
+        next_event = True
+        send_text = 'Вы хотели:\n'
+        for event in events:
+            if event.date < time_now:
+                send_text += '🟢 ' + str(event) + '\n'
+            if event.date >= time_now:
+                if next_event:
+                    send_text += '⚪ ' + str(event) + '\n'
+                    next_event = False
+                else:
+                    send_text += '🟡 ' + str(event) + '\n'
+        self.message.set_text(send_text.rstrip())
+        return
 
     def get_by_date(self, events):
-        return list(map(lambda x: str(x.date.hour) + ':' + str(x.date.minute).rjust(2, '0') + ' ' + x.text,
-                        sorted(self.simple_periodicity(events) + self.periodicity_by_weekday(events),
-                               key=lambda x: x.date)))
+        return list(sorted(self.simple_periodicity(events) + self.periodicity_by_weekday(events),
+                           key=lambda x: x.date))
 
     def periodicity_by_weekday(self, events):
         date = self.message.get_datetime()

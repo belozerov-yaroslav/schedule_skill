@@ -14,3 +14,6 @@ class Event(SqlAlchemyBase):
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False)
     user = orm.relation('User')
     text = sqlalchemy.Column(sqlalchemy.Text, nullable=False)
+
+    def __str__(self):
+        return str(self.date.hour) + ':' + str(self.date.minute).rjust(2, '0') + ' ' + self.text

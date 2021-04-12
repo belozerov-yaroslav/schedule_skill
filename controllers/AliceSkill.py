@@ -14,6 +14,7 @@ from random import choice
 import json
 import logging
 from flask import Flask, request
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -46,31 +47,17 @@ def handle_dialog(message):
     if message.is_new_session():
         sessionStorage.add_session(message.session_id())
         # новая сессия
-        NewSessionUC(message).handle()
+        NewSessionUC(message, sessionStorage).handle()
         return
     # Обрабатываем ответ пользователя.
     if sessionStorage.is_wait_for_confirm(message.session_id()):
-        ConfirmAddUC(message).handle(sessionStorage)
+        ConfirmAddUC(message, sessionStorage).handle(sessionStorage)
         return
     elif had_cmd(message.get_cmd().lower(), ['создай напоминание', 'напомни мне', 'напомни']):
-        try:
-            event_time, event_text, event = CreateEventUC(message).create()
-        except NoTimeException:
-            message.set_text('Извините, я не поняла на какое время вы хотите установить напоминание')
-            return
-        except NoWeekDay:
-            message.set_text('Извините, я не поняла на какое день вы хотите установить напоминание')
-            return
-        message.set_text(f'''Отличное напоминание! на {event_time}, вы хотите {event_text}?''')
-        message.clear_buttons()
-        message.add_buttons([Button('Да'), Button('Нет')])
-        sessionStorage.set_confirm(message.session_id(), event)
+        CreateEventUC(message, sessionStorage).create()
         return
     elif had_cmd(message.get_cmd(), ['что у меня запланировано', 'что запланировано']):
-        try:
-            message.set_text('Вы хотели:\n' + '\n'.join(GetEventsUC(message).get()))
-        except NoTimeException:
-            message.set_text('Извините, я не поняла того, на какой день вы хотите узнать напоминания.')
+        GetEventsUC(message, sessionStorage).get()
         return
     elif had_cmd(message.get_cmd(), ['спасибо', 'благодарю', 'понял']):
         message.set_text(choice(['Незачто', 'Обращайтесь', 'Всегда готова вам помочь']))
