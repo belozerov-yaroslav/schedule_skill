@@ -26,7 +26,7 @@ class Message:
         if self.tts:
             response['response']["tts"] = self.tts
         if self.buttons:
-            response['response']["buttons"] = [button.build() for button in self.buttons]
+            response['response']["buttons"] = [dict(button) for button in self.buttons]
         return response
 
     def get_cmd(self):

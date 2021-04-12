@@ -56,7 +56,7 @@ def handle_dialog(message):
     elif had_cmd(message.get_cmd().lower(), ['создай напоминание', 'напомни мне', 'напомни']):
         CreateEventUC(message, sessionStorage).create()
         return
-    elif had_cmd(message.get_cmd(), ['что у меня запланировано', 'что запланировано']):
+    elif had_cmd(message.get_cmd(), ['что у меня запланировано', 'что запланировано', 'что']):
         GetEventsUC(message, sessionStorage).get()
         return
     elif had_cmd(message.get_cmd(), ['спасибо', 'благодарю', 'понял']):
