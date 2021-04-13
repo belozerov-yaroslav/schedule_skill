@@ -7,6 +7,7 @@ from UseCases.NewSessionUC import NewSessionUC
 from UseCases.CreateEventUC import CreateEventUC
 from UseCases.GetEventsUC import GetEventsUC
 from UseCases.ConfirmAddUC import ConfirmAddUC
+from UseCases.SendMessageUC import SendMessageUC
 from controllers.sessionStorage import SessionStorage
 from controllers.button import Button
 from controllers.had_cmd import had_cmd
@@ -62,14 +63,10 @@ def handle_dialog(message):
     elif had_cmd(message.get_cmd(), ['спасибо', 'благодарю', 'понял']):
         message.set_text(choice(['Незачто', 'Обращайтесь', 'Всегда готова вам помочь']))
     elif had_cmd(message.get_cmd(), ['помощь', 'помоги', 'помоги мне', 'что говорить']):
-        message.set_text(f'Чтобы создать напоминание скажите: "напомни на <дата время>, ' +
-                         '<текст напоминания>", ' +
-                         'обратите внимание, что обязательно вначале указать дату, ' +
-                         'а потом текст, именно в таком порядке.\n' +
-                         'Чтобы узнать, что вы запланировали, скажите "что запланировано на <дата>, <текст>"')
+        SendMessageUC(message, sessionStorage).help()
         return
     else:
-        message.set_text('Я вас не поняла, пожалуйста, переформулируйте запрос')
+        SendMessageUC(message, sessionStorage).not_understand()
         return
 
 

@@ -2,6 +2,7 @@ from .IBaseOperator import IBaseOperator
 from .data import db_session
 from .data.users import User
 from .data.events import Event
+from .data.messages import Notice
 from .data.event_descriptions import EventDescription
 import datetime
 
@@ -86,3 +87,8 @@ class SqlalchemyOperator(IBaseOperator):
     def get_event_description(self, event, db_sess=None):
         event_description = db_sess.query(EventDescription).filter(EventDescription.event == event).one()
         return event_description
+
+    @open_db_sess
+    def get_msg_text(self, name, db_sess=None):
+        text = db_sess.query(Notice).filter(Notice.name == name).one()
+        return text

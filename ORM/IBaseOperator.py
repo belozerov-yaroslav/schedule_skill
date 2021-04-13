@@ -53,3 +53,7 @@ class IBaseOperator(ABC):
     @abstractmethod
     def get_event_description(self, event):
         pass
+
+    @abstractmethod
+    def get_msg_text(self, name):
+        pass
