@@ -97,3 +97,6 @@ class Message:
 
     def clear_buttons(self):
         self.buttons = []
+
+    def timezone(self):
+        return self.meta['timezone']

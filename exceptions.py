@@ -4,3 +4,7 @@ class NoTimeException(Exception):
 
 class NoWeekDay(Exception):
     pass
+
+
+class WrongTimezone(Exception):
+    pass

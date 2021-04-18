@@ -1,5 +1,4 @@
-from ORM.SqlalchemyOperator import SqlalchemyOperator
-from controllers.message import Message
+from UseCases.utc_time import get_zone_time
 from UseCases.UseCase import UseCase
 from datetime import datetime
 from exceptions import *
@@ -18,8 +17,9 @@ class GetEventsUC(UseCase):
         next_event = True
         send_text = 'Вы хотели:\n'
         for event in events:
+            event.date = get_zone_time(event.date, self.message.timezone())
             if event.date < time_now:
-                send_text += '🟢 ' + str(event) + '\n'
+                send_text += '🟢 ' + str(event) + '\n'  # TODO пофиксить вывод(не учитывает переодичность)
             if event.date >= time_now:
                 if next_event:
                     send_text += '⚪ ' + str(event) + '\n'

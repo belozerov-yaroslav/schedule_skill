@@ -60,6 +60,8 @@ def handle_dialog(message):
     elif had_cmd(message.get_cmd(), ['что у меня запланировано', 'что запланировано', 'что']):
         GetEventsUC(message, sessionStorage).get()
         return
+    elif had_cmd(message.get_cmd(), ['удалить на', 'удали на', 'хочу удалить на']):
+        return
     elif had_cmd(message.get_cmd(), ['спасибо', 'благодарю', 'понял']):
         message.set_text(choice(['Незачто', 'Обращайтесь', 'Всегда готова вам помочь']))
     elif had_cmd(message.get_cmd(), ['помощь', 'помоги', 'помоги мне', 'что говорить']):
@@ -71,4 +73,4 @@ def handle_dialog(message):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')

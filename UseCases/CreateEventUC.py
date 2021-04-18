@@ -4,6 +4,7 @@ from ORM.data.event_descriptions import EventDescription
 from controllers.message import Message
 from UseCases.UseCase import UseCase
 from controllers.button import Button
+from UseCases.utc_time import get_utc_time
 from datetime import datetime
 from exceptions import *
 
@@ -17,10 +18,14 @@ class CreateEventUC(UseCase):
             else:
                 event_time, event_text, event = self.simple_event()
         except NoWeekDay:
-            self.message.set_text('Извините, я не поняла на какой день вы хотите установить напоминание')
+            self.message.set_text('Извините, я не поняла, на какой день вы хотите установить напоминание')
             return
         except NoTimeException:
-            self.message.set_text('Извините, я не поняла на какое время вы хотите установить напоминание')
+            self.message.set_text('Извините, я не поняла, на какое время вы хотите установить напоминание')
+            return
+        except WrongTimezone:
+            self.message.set_text('Извините, я не поняла в каком часовом поясе вы находитесь и не могу' +
+                                  ' установить напоминание :(')
             return
         self.message.set_text(f'''Отличное напоминание! на {event_time}, вы хотите {event_text}?''')
         self.message.clear_buttons()
@@ -40,10 +45,10 @@ class CreateEventUC(UseCase):
             raise NoWeekDay
         event = Event(periodicity=2, text=self.get_event_text(), date=self.message.get_datetime(),
                       user=self.repository.get_user(self.message.user_id()))
-        self.repository.add_event(event,
-                                  event_description=EventDescription(text=str(day_count)))
+        self.save_event(event,
+                        event_description=EventDescription(text=str(day_count)))
         return f'каждый {day_count} день, {str(self.message.get_datetime().hour).rjust(2, "0")}:' + \
-               f'{str(self.message.get_datetime().minute).rjust(2, "0")}', self.get_event_text(), event
+               f'{str(self.message.get_datetime().minute).rjust(2, "0")}', self.get_event_text(), event  # TODO __str__
 
     def simple_event(self):
         event_time = self.message.get_datetime()
@@ -59,5 +64,7 @@ class CreateEventUC(UseCase):
         event_text = ' '.join(self.message.split_by_date()[-1])
         return event_text
 
-    def save_event(self, event):
-        self.repository.add_event(event)
+    def save_event(self, event, event_description=None):
+        event.date = get_utc_time(event.date, self.message.timezone())
+        print(event)
+        self.repository.add_event(event, event_description=event_description)
