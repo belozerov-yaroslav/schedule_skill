@@ -8,6 +8,7 @@ from UseCases.CreateEventUC import CreateEventUC
 from UseCases.GetEventsUC import GetEventsUC
 from UseCases.ConfirmAddUC import ConfirmAddUC
 from UseCases.SendMessageUC import SendMessageUC
+from UseCases.DeleteEventUC import DeleteEventUC
 from controllers.sessionStorage import SessionStorage
 from controllers.button import Button
 from controllers.had_cmd import had_cmd
@@ -54,6 +55,9 @@ def handle_dialog(message):
     if sessionStorage.is_wait_for_confirm(message.session_id()):
         ConfirmAddUC(message, sessionStorage).handle(sessionStorage)
         return
+    elif sessionStorage.is_wait_for_delete(message.session_id()):
+        DeleteEventUC(message, sessionStorage).delete()
+        return
     elif had_cmd(message.get_cmd().lower(), ['создай напоминание', 'напомни мне', 'напомни']):
         CreateEventUC(message, sessionStorage).create()
         return
@@ -61,6 +65,7 @@ def handle_dialog(message):
         GetEventsUC(message, sessionStorage).get()
         return
     elif had_cmd(message.get_cmd(), ['удалить на', 'удали на', 'хочу удалить на']):
+        DeleteEventUC(message, sessionStorage).delete()
         return
     elif had_cmd(message.get_cmd(), ['спасибо', 'благодарю', 'понял']):
         message.set_text(choice(['Незачто', 'Обращайтесь', 'Всегда готова вам помочь']))
