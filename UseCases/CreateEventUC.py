@@ -1,22 +1,20 @@
-from ORM.SqlalchemyOperator import SqlalchemyOperator
+from UseCases.UseCase import UseCase
+from UseCases.utc_time import get_utc_time
+from controllers.button import Button
 from ORM.data.events import Event
 from ORM.data.event_descriptions import EventDescription
-from controllers.message import Message
-from UseCases.UseCase import UseCase
-from controllers.button import Button
-from UseCases.utc_time import get_utc_time
-from datetime import datetime
 from exceptions import *
 
 
 class CreateEventUC(UseCase):
-    def create(self):
+    # создает event и устанавливает ожидание подтверждения
+    def create(self):  # определяет тип напоминания и включает отслеживание
         cmd = self.message.get_cmd().split()
         try:
             if any(map(lambda x: x in cmd, ['каждый', 'каждую', 'каждое'])):
-                event_time, event_text, event = self.every_week_day()
+                event_time, event_text, event = self.every_week_day()  # переодичность в днях недели
             else:
-                event_time, event_text, event = self.simple_event()
+                event_time, event_text, event = self.simple_event()  # обычный event
         except NoWeekDay:
             self.message.set_text('Извините, я не поняла, на какой день вы хотите установить напоминание')
             return
@@ -32,12 +30,12 @@ class CreateEventUC(UseCase):
         self.message.add_buttons([Button('Да'), Button('Нет')])
         self.session_storage.set_confirm(self.message.session_id(), event)
 
-    def every_week_day(self):
+    def every_week_day(self):  # если есть слово "каждый"
         cmd = self.message.get_cmd().split()
         for word in ['каждый', 'каждую', 'каждое']:
             if word in cmd:
                 break
-        week_day = cmd[cmd.index(word) + 1]
+        week_day = cmd[cmd.index(word) + 1]  # слово дня недели
         for name, day_count in zip(['пон', 'вто', 'сре', 'чет', 'пят', 'суб', 'вос'], range(1, 8)):
             if week_day.startswith(name):
                 break
@@ -48,9 +46,9 @@ class CreateEventUC(UseCase):
         self.save_event(event,
                         event_description=EventDescription(text=str(day_count)))
         return f'каждый {day_count} день, {str(self.message.get_datetime().hour).rjust(2, "0")}:' + \
-               f'{str(self.message.get_datetime().minute).rjust(2, "0")}', self.get_event_text(), event  # TODO __str__
+               f'{str(self.message.get_datetime().minute).rjust(2, "0")}', self.get_event_text(), event
 
-    def simple_event(self):
+    def simple_event(self):  # обычный event
         event_time = self.message.get_datetime()
         event_text = self.get_event_text()
         event = Event(date=event_time,
@@ -60,11 +58,10 @@ class CreateEventUC(UseCase):
         self.save_event(event)
         return event_time.strftime("%d/%m/%Y, %H:%M:%S"), event_text, event
 
-    def get_event_text(self):
+    def get_event_text(self):  # получить текст напоминания
         event_text = ' '.join(self.message.split_by_date()[-1])
         return event_text
 
-    def save_event(self, event, event_description=None):
+    def save_event(self, event, event_description=None):  # сохранить event
         event.date = get_utc_time(event.date, self.message.timezone())
-        print(event)
         self.repository.add_event(event, event_description=event_description)

@@ -35,14 +35,6 @@ class IBaseOperator(ABC):
         pass
 
     @abstractmethod
-    def delete_useless_events(self):
-        pass
-
-    @abstractmethod
-    def delete_old_users(self):
-        pass
-
-    @abstractmethod
     def update_user_info(self, user):
         pass
 
