@@ -42,7 +42,7 @@ class GetEventsUC(UseCase):  # выводит все event пользовате�
 
     def get_by_date(self, events):  # получить все event на определенную дату
         return list(sorted(self.simple_periodicity(events) + self.periodicity_by_weekday(events),
-                           key=lambda x: x.date))
+                           key=lambda x: (x.date.hour, x.date.minute)))
 
     def periodicity_by_weekday(self, events):
         # получение всех event, которые подходят к дате по переодичности

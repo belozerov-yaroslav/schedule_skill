@@ -64,7 +64,7 @@ class CreateEventUC(UseCase):
                       text=event_text)
         event_id = event.id
         self.save_event(event)
-        return event_time.strftime("%d/%m/%Y, %H:%M:%S"), event_text, event_id
+        return event_time.strftime("%d/%m/%Y, %H:%M"), event_text, event_id
 
     def get_event_text(self):  # получить текст напоминания
         event_text = ' '.join(self.message.split_by_date()[-1])
