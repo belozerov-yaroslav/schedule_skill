@@ -49,6 +49,10 @@ class SqlalchemyOperator(IBaseOperator):
 
     @open_and_commit_db_sess
     def delete_user_event(self, event, db_sess=None):  # удаляет event
+        description = db_sess.query(EventDescription).filter(EventDescription.event_id == event.id).all()
+        if description:
+            db_sess.delete(description[0])
+            db_sess.commit()
         db_sess.delete(event)
 
     @open_db_sess
@@ -89,3 +93,12 @@ class SqlalchemyOperator(IBaseOperator):
     def get_msg_text(self, name, db_sess=None):  # получение стандартного ответа по метке
         text = db_sess.query(Notice).filter(Notice.name == name).one()
         return text
+
+    @open_db_sess
+    def get_event_by_id(self, id, db_sess=None):
+        event = db_sess.query(Event).filter(Event.id == id).one()
+        return event
+
+    @open_db_sess
+    def get_new_id(self, db_sess=None):
+        return max([i[0] for i in db_sess.query(Event.id).all()]) + 1

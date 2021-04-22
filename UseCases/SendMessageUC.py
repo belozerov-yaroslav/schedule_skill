@@ -3,7 +3,11 @@ from UseCases.UseCase import UseCase
 
 class SendMessageUC(UseCase):
     def not_understand(self):  # неизвестная команда
-        self.message.set_text(self.repository.get_msg_text('not_understand').text)
+        msg = str(self.repository.get_msg_text('not_understand').text)
+        self.message.set_text(msg)
+        self.message.set_tts(msg.replace('\n', '').replace('>', '').replace('<', ''))
 
     def help(self):  # вывод помощи
-        self.message.set_text(self.repository.get_msg_text('help').text)
+        msg = str(self.repository.get_msg_text('help').text)
+        self.message.set_text(msg)
+        self.message.set_tts(msg.replace('\\n', '').replace('>', '').replace('<', ''))

@@ -24,9 +24,12 @@ class DeleteEventUC(UseCase):  # отслеживание удаления event
         events = GetEventsUC(self.message, self.session_storage).get_by_date(all_events)
         send_text = f'Напоминания на {self.message.get_datetime().strftime("%d/%m/%Y, %H:%M:%S")},' + \
                     ' для удаления скажите номер нужного события:\n'
+        tts_text = send_text
         for num, event in enumerate(events):  # генерация списка событий
-            send_text += str(num + 1) + ' : ' + str(event) + '\n'
+            send_text += str(num + 1) + ' ) ' + str(event) + '\n'
+            tts_text += str(event) + '\n'
         self.message.set_text(send_text.rstrip())
+        self.message.set_tts(tts_text)
         self.session_storage.set_delete(self.message.session_id(), events)
         self.message.clear_buttons()
         self.message.add_buttons([Button(str(i + 1)) for i in range(len(events))] + [Button('Отмена')])

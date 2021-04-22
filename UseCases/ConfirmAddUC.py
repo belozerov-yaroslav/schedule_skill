@@ -13,7 +13,9 @@ class ConfirmAddUC(UseCase):
             session_storage.delete_confirm(self.message.session_id())
         elif had_cmd(self.message.get_cmd(), ['нет']):  # отменяет, удаляем event, удаляем отслеживание
             self.message.set_text('Напоминание отменено.')
-            self.repository.delete_user_event(session_storage.get_confirm_event(self.message.session_id()))
+            event = self.repository.get_event_by_id(self.session_storage.get_confirm_event(
+                self.message.session_id()))
+            self.repository.delete_user_event(event)
             session_storage.delete_confirm(self.message.session_id())
         else:  # неправильная команда, просим повторить и обновляем кнопки
             self.message.set_text('Пожалуйста, подтвердите добавление напоминания.')

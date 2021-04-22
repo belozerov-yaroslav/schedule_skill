@@ -15,7 +15,11 @@ class GetEventsUC(UseCase):  # выводит все event пользовате�
             return
         time_now = get_zone_time(datetime.now(), self.message.timezone())
         next_event = True
+        if len(events) == 0:
+            self.message.set_text('У вас пока нет напоминаний на этот день')
+            return
         send_text = 'Вы хотели:\n'
+        tts_text = 'Вы хотели:\n'
         if self.message.get_datetime().date() == time_now.date():
             for event in events:
                 event.date = get_zone_time(event.date, self.message.timezone())
@@ -27,10 +31,13 @@ class GetEventsUC(UseCase):  # выводит все event пользовате�
                         next_event = False
                     else:
                         send_text += '🟡 ' + str(event) + '\n'  # event в будущем
+                tts_text += str(event)[0:3] + 'sil <[500]>' + str(event)[3:] + '\n'
         else:
             for event in events:
                 send_text += '🟡 ' + str(event) + '\n'
+                tts_text += str(event)[0:3] + str(event)[3:] + '\n'
         self.message.set_text(send_text.rstrip())
+        self.message.set_tts(tts_text)
         return
 
     def get_by_date(self, events):  # получить все event на определенную дату
